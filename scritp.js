@@ -18,13 +18,13 @@ function renderCheckboxes() {
    console.log(rows, columns)
    for (let i = 0; i < rows; i++) {
       const rowContainer = document.createElement("div");
-      rowContainer.setAttribute("class", `row r${i}`);
+      rowContainer.setAttribute("class", `row r${i}`); //each row have a unique r${i} class
       checkboxMatrix.appendChild(rowContainer);
       for (let j = 0; j < columns; j++) {
          const newInput = document.createElement("input");
          newInput.setAttribute("type", "checkbox");
-         newInput.setAttribute("class", `column c${j}`);
-         newInput.id = `e${i}${j}`;
+         newInput.setAttribute("class", `column c${j}`); //each column is a child of a row div and have the class c${i}
+         newInput.id = `e_${i}_${j}`; //each cell/element have the id e${i}{j}
          const addedCheckbox = rowContainer.appendChild(newInput);
          // console.log(`"${i}${j}"`, addedCheckbox);
 
@@ -51,10 +51,30 @@ renderAreaButton.addEventListener("click", () => {
 
 /**
  * 
- * @param {*} cell this is the html node that represent a cell. It id property is the cell row-columns number.
- * @returns a number with the number of cells.
+ * @param {*} cell HTML element with an id in the /#e-\d-\d/ format
+ * @returns a number with the live number of cells.
  */
-const getNeighbours = (cell) =>{
-   const 
+const getLiveNeighbours = (currentCell = document.querySelector()) => {
+   if (!/e_\d+_\d+/.test(currentCell.id)) {
+      console.log("not valid id");
+   }
+   console.log("id is ", currentCell.id);
+   const idArray = currentCell.id.split("_");
+   const currentRow = idArray[1];
+   const currentCol = idArray[2];
+   console.log(currentRow, currentCol, idArray)
+
+   for (let i = currentRow - 1; i <= currentRow + 1; i++) {
+      for (let j = currentCol - 1; j <= currentCol + 1; j++) {
+         if (i != currentRow && j != currentCol) {
+            const neighboursCell = document.querySelector(`#e_${i}_${j}`);
+            console.log(neighboursCell.id,i != currentRow, j != currentCol);
+         }
+      }
+   }
+
+
 }
 
+console.log(checkboxMatrix.childNodes)
+console.log(getLiveNeighbours(document.querySelector("#e_1_1")));
