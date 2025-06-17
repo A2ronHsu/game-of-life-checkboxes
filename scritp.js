@@ -58,23 +58,37 @@ const getLiveNeighbours = (currentCell = document.querySelector()) => {
    if (!/e_\d+_\d+/.test(currentCell.id)) {
       console.log("not valid id");
    }
-   console.log("id is ", currentCell.id);
    const idArray = currentCell.id.split("_");
-   const currentRow = idArray[1];
-   const currentCol = idArray[2];
-   console.log(currentRow, currentCol, idArray)
-
+   const currentRow = Number(idArray[1]);
+   const currentCol = Number(idArray[2]);
+   let count = 0;
    for (let i = currentRow - 1; i <= currentRow + 1; i++) {
       for (let j = currentCol - 1; j <= currentCol + 1; j++) {
-         if (i != currentRow && j != currentCol) {
+         if (i != currentRow || j != currentCol) {
             const neighboursCell = document.querySelector(`#e_${i}_${j}`);
-            console.log(neighboursCell.id,i != currentRow, j != currentCol);
+            if (neighboursCell) {
+               if (neighboursCell.checked) count++;
+            }
          }
       }
    }
-
-
+   return count;
+   
 }
 
-console.log(checkboxMatrix.childNodes)
+const liveOrDie = (currentCell = document.querySelector()) =>{
+   const isCurrentCellChecked = currentCell.checked;
+   const liveNeighboursCellCount = getLiveNeighbours(currentCell);
+   
+   if(isCurrentCellChecked){
+      if (liveNeighboursCellCount < 2) currentCell.checked = false;
+      if (liveNeighboursCellCount > 3) currentCell.checked = false;
+   }else{
+      if (liveNeighboursCellCount == 3) currentCell.checked = true;
+   }
+}
+
+
+
+console.log(checkboxMatrix.childNodes);
 console.log(getLiveNeighbours(document.querySelector("#e_1_1")));
