@@ -2,49 +2,47 @@ const main = document.querySelector("main");
 const rowInput = document.querySelector("#row");
 const columnInput = document.querySelector("#column");
 const renderAreaButton = document.querySelector("#renderArea");
-let checkboxMatrix = document.querySelector(".checkbox_matrix");
+const startButton = document.querySelector("#start-button")
 
-
-test = document.querySelector("#test");
-test.addEventListener("click", () => {
-   const element00 = document.querySelector("#e00");
-   console.log(element00.checked);
-})
-//initial state
-
-function renderCheckboxes() {
+function renderEmptyCheckboxes() {
    const rows = rowInput.valueAsNumber;
    const columns = columnInput.valueAsNumber;
-   console.log(rows, columns)
+   let matrix = document.createElement("div");
+   matrix.setAttribute("class", "checkbox_matrix");
+
+
+   // console.log(rows, columns)
    for (let i = 0; i < rows; i++) {
       const rowContainer = document.createElement("div");
       rowContainer.setAttribute("class", `row r${i}`); //each row have a unique r${i} class
-      checkboxMatrix.appendChild(rowContainer);
+      matrix.appendChild(rowContainer);
       for (let j = 0; j < columns; j++) {
          const newInput = document.createElement("input");
          newInput.setAttribute("type", "checkbox");
          newInput.setAttribute("class", `column c${j}`); //each column is a child of a row div and have the class c${i}
          newInput.id = `e_${i}_${j}`; //each cell/element have the id e${i}{j}
-         const addedCheckbox = rowContainer.appendChild(newInput);
+         rowContainer.appendChild(newInput);
          // console.log(`"${i}${j}"`, addedCheckbox);
 
       }
    }
+
+   return matrix;
 }
+
+main.append(renderEmptyCheckboxes());
 
 function clearCheckboxMatrix() {
+   const checkboxMatrix = document.querySelector(".checkbox_matrix");
    checkboxMatrix.remove();
-   checkboxMatrix = document.createElement("div");
-   checkboxMatrix.setAttribute("class", "checkbox_matrix");
-   main.appendChild(checkboxMatrix);
+
 }
 
-renderCheckboxes();
 
 
 renderAreaButton.addEventListener("click", () => {
    clearCheckboxMatrix();
-   renderCheckboxes();
+   main.append(renderEmptyCheckboxes());
 });
 
 //Conway's game o life rules
@@ -73,22 +71,53 @@ const getLiveNeighbours = (currentCell = document.querySelector()) => {
       }
    }
    return count;
-   
+
 }
 
-const liveOrDie = (currentCell = document.querySelector()) =>{
+const liveOrDie = (currentCell = document.querySelector(), liveNeighboursCellCount) => {
    const isCurrentCellChecked = currentCell.checked;
-   const liveNeighboursCellCount = getLiveNeighbours(currentCell);
-   
-   if(isCurrentCellChecked){
-      if (liveNeighboursCellCount < 2) currentCell.checked = false;
-      if (liveNeighboursCellCount > 3) currentCell.checked = false;
-   }else{
-      if (liveNeighboursCellCount == 3) currentCell.checked = true;
+
+   if (isCurrentCellChecked) {
+      if (liveNeighboursCellCount < 2 || liveNeighboursCellCount > 3) return false;
+      else return true
+   } else {
+      if (liveNeighboursCellCount == 3) return true;
    }
 }
 
 
 
-console.log(checkboxMatrix.childNodes);
-console.log(getLiveNeighbours(document.querySelector("#e_1_1")));
+const updateState = () => {
+   const updateCheckboxMatrix = renderEmptyCheckboxes()
+   const updateStateRow = updateCheckboxMatrix.children;
+   for (let i = 0; i < updateStateRow.length; i++) {
+      const updateStateColumns = updateStateRow[i].children;
+      for (let j = 0; j < updateStateColumns.length; j++) {
+         const currentStateCell = document.querySelector(`#e_${i}_${j}`);
+         const neighboursCount = getLiveNeighbours(currentStateCell);
+         updateStateColumns[j].checked = liveOrDie(currentStateCell, neighboursCount);
+
+      }
+   }
+   clearCheckboxMatrix();
+   main.append(updateCheckboxMatrix);
+}
+
+let buttonSwitch = false
+let timer;
+startButton.addEventListener("click", () => {
+   buttonSwitch = !buttonSwitch;
+   console.log(buttonSwitch);
+   if (buttonSwitch) {
+      timer = setInterval(() => {
+         updateState()
+      }, 500)
+   }else{
+      clearInterval(timer);
+   }
+
+})
+
+
+
+// console.log(getLiveNeighbours(document.querySelector("#e_1_1")));
